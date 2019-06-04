@@ -79,6 +79,17 @@ class Field:
 			# er0111: name cannot have non alphabetic characters
 			return 'er0111'
 
+	def station_name(self,name):
+
+		command ="SELECT name FROM station WHERE name =\'"+name+"\'"
+		cursor = self.db.cursor()
+		cursor.execute(command)
+		names = cursor.fetchall()
+		if not names:
+			return name
+		else:
+			return 'er0111'
+
 	def error(self,error = None):
 		# 1) will take as input a single error or a list of errors
         # 2) each error will be Identified by a four digit error code
