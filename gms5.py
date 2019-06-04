@@ -106,7 +106,6 @@ class Station:
         #1) collects the measurements
         #2) Adds them to the database
 
-        Measurements = namedtuple('Measurements','station_id fuelDeposit_id compt fuelType rHeight dHeight')
         command = "SELECT id FROM fuelDeposit WHERE station_id = \'"+str(station_id)+"\'"
         cursor = self.db.cursor()
         cursor.execute(command)
@@ -114,13 +113,21 @@ class Station:
         fuelDeposit_id = id[len(id)-1][0]
 
         command = "INSERT INTO measurements (station_id, fuelDeposit_id, compt, fuelType, rHeight, dHeight) VALUES (%s,%s,%s,%s,%s,%s)"
+
+
+        na_count = 0
         for measurement in measurements:
             if "N/A" in measurement:
-                continue
-            else:
+                na_count +=1
+
+        for measurement in measurements:
+            if na_count!=5:
                 values = tuple([station_id, fuelDeposit_id]+measurement)
                 cursor.execute(command,values)
                 self.db.commit()
+                return True
+            else:
+                return 'er0000'
 
     def fuelDeposit(self, fuelDeposit_data = None):
         FuelDeposit = namedtuple('FuelDeposit','station_id id_citern date_added')
@@ -598,7 +605,32 @@ class gmsMain:
                                  ["CRX3",self.mainWindow.CRX3_comboBox.currentText(),self.mainWindow.RCRX3_doubleSpinBox.value(),self.mainWindow.DCRX3_doubleSpinBox.value()],
                                  ["CRX4",self.mainWindow.CRX4_comboBox.currentText(),self.mainWindow.RCRX4_doubleSpinBox.value(),self.mainWindow.DCRX4_doubleSpinBox.value()],
                                  ["CRX5",self.mainWindow.CRX5_comboBox.currentText(),self.mainWindow.RCRX5_doubleSpinBox.value(),self.mainWindow.DCRX5_doubleSpinBox.value()]]
-            self.station.measurements(station_id = self.station.stationId ,measurements = measurements_data)
+
+            self.station.fuelDeposit(fuelDepositData)
+            measurements_status = self.station.measurements(station_id = self.station.stationId ,measurements = measurements_data)
+            if measurements_status!=True:
+                self.mainWindow.msgBox(self.error[measurements_status])
+
+            else:   
+                self.mainWindow.CRX1_comboBox.setCurrentIndex(0)
+                self.mainWindow.CRX2_comboBox.setCurrentIndex(0)
+                self.mainWindow.CRX3_comboBox.setCurrentIndex(0)
+                self.mainWindow.CRX4_comboBox.setCurrentIndex(0)
+                self.mainWindow.CRX5_comboBox.setCurrentIndex(0)
+
+                self.mainWindow.RCRX1_doubleSpinBox.clear()
+                self.mainWindow.RCRX2_doubleSpinBox.clear()
+                self.mainWindow.RCRX3_doubleSpinBox.clear()
+                self.mainWindow.RCRX4_doubleSpinBox.clear()
+                self.mainWindow.RCRX5_doubleSpinBox.clear()
+
+                self.mainWindow.DCRX1_doubleSpinBox.clear()
+                self.mainWindow.DCRX2_doubleSpinBox.clear()
+                self.mainWindow.DCRX3_doubleSpinBox.clear()
+                self.mainWindow.DCRX4_doubleSpinBox.clear()
+                self.mainWindow.DCRX5_doubleSpinBox.clear()
+
+                self.mainWindow.msgBox('Measurements for '+self.mainWindow.truckId_lineEdit.text()+' has been added to database')
 
     def displayTable(self):
         tableName = self.mainWindow.tableSelection_comboBox.currentText()
