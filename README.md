@@ -8,4 +8,6 @@ This repository was created for the purpose of demonstrating chuncks of code use
 - Has input sanitization for database
 - Has error warnings
 - Uses PyQt
+- Object Oriented Programming
+- Test Driven Development (TDD)
 
