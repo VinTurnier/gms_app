@@ -1,3 +1,4 @@
 gmsMainWindow.py
 gmsMainWindow.ui
 private.py
+__pycache__
