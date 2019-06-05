@@ -12,6 +12,6 @@ This repository was created for the purpose of demonstrating chuncks of code use
 - Object Oriented Programming
 - Test Driven Development (TDD) with PyTest
 
-The goal of this project is to collect data that is used for predictive modeling
+The goal of this project is to collect data that is used for predictive modeling. Because the project is for a private company not all of the files are being displayed. Adanced Queries are not show as those are critical to the companies project.
 
 
