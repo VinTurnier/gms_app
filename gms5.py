@@ -4,12 +4,13 @@ import gmsMainWindow
 import mysql.connector
 import hashlib, binascii, os
 import re
-import herokuappRequest
 from datetime import date
 
 # GMS Modules
 import user
 import fields
+import station
+import gmsQueries
 from private import Keys
 
 class Station:
@@ -88,8 +89,6 @@ class Station:
         self.stationDepartment = station_data.department
         self.numOfTanks = station_data.numOfTanks
 
-    def tank(self):
-        pass
 
     def displayCRX(self,id_citern):
         command = "SELECT * FROM crx WHERE idCitern = \'"+id_citern+"\'"
@@ -209,25 +208,7 @@ class Station:
         cursor.execute(command)
         return cursor.fetchall()
 
-    def emptyField(self,stationInfo = None):
-        #Checks to see if there is an empty field in the data that is stored
-        #if it returns True then a warning is trigerred saying: Missing information
-        if '' in stationInfo:
-            return 'er0000'
-        else:
-            return False
 
-    def errorCheck(self, error = None):
-        #1) identigies if there is an error in the station
-        #2) Error Code: er1000: Station name already exists
-        errors = ['er0111']
-        for i in error:
-            if i in errors:
-                return i
-        return False
-
-    def sanityze(self, sanityzation):
-        pass
 
 class Tank:
     tank = namedtuple('tank','name capacity diameter length thickness')
@@ -283,7 +264,8 @@ class gmsMain:
             'er0101': "The passwords you have entered do not match",
             'er0110': "Username or Password does not match",
             'er0111': "Station name already exists",
-            'er1000': "Invalid ID Citern"}
+            'er1000': "Invalid ID Citern",
+            'er1111': "First name or last name cannot contain non-alphabetical characters"}
 
     def __init__(self):
         #gui window code
@@ -380,20 +362,20 @@ class gmsMain:
     def setupStation(self):
 
         self.setupStation_info = [self.mainWindow.franchisor_comboBox.currentText(),
-                                  self.station.nameFieldCheck(self.mainWindow.stationName_lineEdit.text()),
+                                  self.field.station_name(self.mainWindow.stationName_lineEdit.text()),
                                   self.mainWindow.streetAddress_lineEdit.text(),
                                   self.mainWindow.city_lineEdit.text(),
                                   self.mainWindow.department_lineEdit.text(),
                                   self.mainWindow.numOfTanks_comboBox.currentText()]
 
-        if self.station.errorCheck(self.setupStation_info) == False and self.station.emptyField(self.setupStation_info) == False:
+        if self.field.error(self.setupStation_info) == False and self.field.empty(self.setupStation_info) == False:
             self.tankInfo_page()
 
         else:
             try:
-                self.mainWindow.msgBoxError(self.error[self.station.errorCheck(self.setupStation_info)])
+                self.mainWindow.msgBoxError(self.error[self.field.error(self.setupStation_info)])
             except:
-                self.mainWindow.msgBoxError(self.error[self.station.emptyField(self.setupStation_info)])
+                self.mainWindow.msgBoxError(self.error[self.field.empty(self.setupStation_info)])
 
     def changeStation(self):
         try:
