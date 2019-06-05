@@ -1,10 +1,10 @@
-from collections import namedtuple
-from PyQt5 import QtCore, QtGui, QtWidgets
+
 import gmsMainWindow
 import mysql.connector
-import hashlib, binascii, os
-import re
 from datetime import date
+from collections import namedtuple
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 # GMS Modules
 import user
@@ -237,7 +237,7 @@ class gmsMain:
         self.mainWindow.numOfTanks_comboBox.addItems(numOfTanks)
 
     def franchisor_comboBox_text(self):
-        franchisors = ('Total','National','Go')
+        franchisors = ('Total','National','Go','Capital','DNC')
         self.mainWindow.franchisor_comboBox.addItems(franchisors)
 
     def period_comboBox_text(self):
@@ -257,7 +257,7 @@ class gmsMain:
 
     def tankInfo_page(self):
         self.mainWindow.tableWidget.setColumnCount(5)
-        self.mainWindow.tableWidget.setHorizontalHeaderLabels(('Name','Capacity','Diameter','Length','Thickness'))
+        self.mainWindow.tableWidget.setHorizontalHeaderLabels(('Name','Capacity','Diameter','Length','Steel'))
         self.mainWindow.tableWidget.setRowCount(int(self.mainWindow.numOfTanks_comboBox.currentText()))
         self.mainWindow.listWidget.clear()
         self.mainWindow.gmsStationSetup_stackedWidget.setCurrentIndex(2)
@@ -384,40 +384,44 @@ class gmsMain:
                            self.mainWindow.truckId_lineEdit.text(),
                            self.mainWindow.fuel_dateEdit.text()]
 
-        if (self.query.fuelDeposit(fuelDepositData)=='er0000'):
-            self.mainWindow.msgBoxError(self.error['er0000'])
+        measurements_data = [["CRX1",self.mainWindow.CRX1_comboBox.currentText(),self.mainWindow.RCRX1_doubleSpinBox.value(),self.mainWindow.DCRX1_doubleSpinBox.value()],
+                             ["CRX2",self.mainWindow.CRX2_comboBox.currentText(),self.mainWindow.RCRX2_doubleSpinBox.value(),self.mainWindow.DCRX2_doubleSpinBox.value()],
+                             ["CRX3",self.mainWindow.CRX3_comboBox.currentText(),self.mainWindow.RCRX3_doubleSpinBox.value(),self.mainWindow.DCRX3_doubleSpinBox.value()],
+                             ["CRX4",self.mainWindow.CRX4_comboBox.currentText(),self.mainWindow.RCRX4_doubleSpinBox.value(),self.mainWindow.DCRX4_doubleSpinBox.value()],
+                             ["CRX5",self.mainWindow.CRX5_comboBox.currentText(),self.mainWindow.RCRX5_doubleSpinBox.value(),self.mainWindow.DCRX5_doubleSpinBox.value()]]
+        na_count=0
+        for measurement in measurements_data:
+            if 'N/A' in measurement:
+                na_count +=1
+                
+        if na_count!=5 and self.query.fuelDeposit(fuelDepositData)!='er0000':
+            measurements_status = self.query.measurements(station_id = self.station.stationId ,measurements = measurements_data) 
+
+            self.mainWindow.CRX1_comboBox.setCurrentIndex(0)
+            self.mainWindow.CRX2_comboBox.setCurrentIndex(0)
+            self.mainWindow.CRX3_comboBox.setCurrentIndex(0)
+            self.mainWindow.CRX4_comboBox.setCurrentIndex(0)
+            self.mainWindow.CRX5_comboBox.setCurrentIndex(0)
+
+            self.mainWindow.RCRX1_doubleSpinBox.clear()
+            self.mainWindow.RCRX2_doubleSpinBox.clear()
+            self.mainWindow.RCRX3_doubleSpinBox.clear()
+            self.mainWindow.RCRX4_doubleSpinBox.clear()
+            self.mainWindow.RCRX5_doubleSpinBox.clear()
+
+            self.mainWindow.DCRX1_doubleSpinBox.clear()
+            self.mainWindow.DCRX2_doubleSpinBox.clear()
+            self.mainWindow.DCRX3_doubleSpinBox.clear()
+            self.mainWindow.DCRX4_doubleSpinBox.clear()
+            self.mainWindow.DCRX5_doubleSpinBox.clear()
+
+            self.mainWindow.msgBox('Measurements for '+self.mainWindow.truckId_lineEdit.text()+' has been added to database')
         else:
-            measurements_data = [["CRX1",self.mainWindow.CRX1_comboBox.currentText(),self.mainWindow.RCRX1_doubleSpinBox.value(),self.mainWindow.DCRX1_doubleSpinBox.value()],
-                                 ["CRX2",self.mainWindow.CRX2_comboBox.currentText(),self.mainWindow.RCRX2_doubleSpinBox.value(),self.mainWindow.DCRX2_doubleSpinBox.value()],
-                                 ["CRX3",self.mainWindow.CRX3_comboBox.currentText(),self.mainWindow.RCRX3_doubleSpinBox.value(),self.mainWindow.DCRX3_doubleSpinBox.value()],
-                                 ["CRX4",self.mainWindow.CRX4_comboBox.currentText(),self.mainWindow.RCRX4_doubleSpinBox.value(),self.mainWindow.DCRX4_doubleSpinBox.value()],
-                                 ["CRX5",self.mainWindow.CRX5_comboBox.currentText(),self.mainWindow.RCRX5_doubleSpinBox.value(),self.mainWindow.DCRX5_doubleSpinBox.value()]]
+            self.mainWindow.msgBoxError(self.error['er0000'])
+            return -1
 
-            self.query.fuelDeposit(fuelDepositData)
-            measurements_status = self.query.measurements(station_id = self.station.stationId ,measurements = measurements_data)
-            if measurements_status!=True:
-                self.mainWindow.msgBox(self.error[measurements_status])
-
-            else:   
-                self.mainWindow.CRX1_comboBox.setCurrentIndex(0)
-                self.mainWindow.CRX2_comboBox.setCurrentIndex(0)
-                self.mainWindow.CRX3_comboBox.setCurrentIndex(0)
-                self.mainWindow.CRX4_comboBox.setCurrentIndex(0)
-                self.mainWindow.CRX5_comboBox.setCurrentIndex(0)
-
-                self.mainWindow.RCRX1_doubleSpinBox.clear()
-                self.mainWindow.RCRX2_doubleSpinBox.clear()
-                self.mainWindow.RCRX3_doubleSpinBox.clear()
-                self.mainWindow.RCRX4_doubleSpinBox.clear()
-                self.mainWindow.RCRX5_doubleSpinBox.clear()
-
-                self.mainWindow.DCRX1_doubleSpinBox.clear()
-                self.mainWindow.DCRX2_doubleSpinBox.clear()
-                self.mainWindow.DCRX3_doubleSpinBox.clear()
-                self.mainWindow.DCRX4_doubleSpinBox.clear()
-                self.mainWindow.DCRX5_doubleSpinBox.clear()
-
-                self.mainWindow.msgBox('Measurements for '+self.mainWindow.truckId_lineEdit.text()+' has been added to database')
+            
+            
 
     def displayTable(self):
         tableName = self.mainWindow.tableSelection_comboBox.currentText()
