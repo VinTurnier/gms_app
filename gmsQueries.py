@@ -31,23 +31,13 @@ class Query:
 		command = "INSERT INTO measurements (station_id, fuelDeposit_id, compt, fuelType, rHeight, dHeight) VALUES (%s,%s,%s,%s,%s,%s)"
 
 
-		na_count = 0
 		for measurement in measurements:
-			if "N/A" in measurement:
-				na_count +=1
-
-		for measurement in measurements:
-			if na_count!=5:
-				if 'N/A' in measurement:
-					continue
-				else:
-					values = tuple([station_id, fuelDeposit_id]+measurement)
-					self.cursor.execute(command,values)
-					self.db.commit()
+			if 'N/A' in measurement:
+				continue
 			else:
-				self.db.close()
-				return 'er0000'
-
+				values = tuple([station_id, fuelDeposit_id]+measurement)
+				self.cursor.execute(command,values)
+				self.db.commit()
 		self.db.close()
 		return True
 
@@ -60,6 +50,7 @@ class Query:
 		command = "INSERT INTO fuelDeposit(station_id, idCitern, date_added) VALUES (%s,%s,%s)"
 		if '' in fuelDeposit_data:
 			self.db.close()
+
 			return 'er0000'
 		else:
 			values = (fuelDeposit_data.station_id,
@@ -68,6 +59,7 @@ class Query:
 			self.cursor.execute(command,values)
 			self.db.commit()
 			self.db.close()
+
 
 
 	def inventory(self, inventoryData = None):
