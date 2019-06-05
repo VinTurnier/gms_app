@@ -1,11 +1,12 @@
-import mysql.connector
+
 from private import Keys
 from collections import namedtuple
 
-class Tank:
+class Tank(Keys):
 	tank = namedtuple('tank','name capacity diameter length thickness')
 
 	def __init__(self,station_id):
+		super().__init__()
 		self.station_id = station_id
 		
 
@@ -37,11 +38,4 @@ class Tank:
 			self.thickness = tank_info[0][6]
 		self.db.close()
 
-	def refresh_db(self):
-		key = Keys()
-		self.db = mysql.connector.connect(host = key.mysql_host,
-											user = key.mysql_user,
-											passwd = key.mysql_password,
-											database = key.mysql_database)
-		self.cursor = self.db.cursor()
 

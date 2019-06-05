@@ -122,7 +122,7 @@ class Query:
 
 		self.tableHeader = {"CRX": ("ID Citern","CRX1","CRX2","CRX3","CRX4","CRX5","Eperation Date"),
 							"Inventory": ("Tank Name","StockBoD","Fuel Deposit","Sales","StockEoD","Date"),
-							"Measurements": ("Compartement","Fuel Type","Recieved Height","Deposit Height","Date"),
+							"Measurements": ("Compartement","Tank","Recieved Height","Deposit Height","Date"),
 							"Fuel Deposit": ("ID Citern","Expected (Gal)","Date")}
 
 		command = tables[table]

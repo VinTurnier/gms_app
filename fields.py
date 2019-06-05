@@ -1,9 +1,11 @@
 import re
-import mysql.connector
 from collections import namedtuple
-import user 
+from user import User
 from private import Keys
-class Field:
+class Field(Keys):
+
+	def __init__(self):
+		super().__init__()
 
 
 	def check(self, data = None):
@@ -17,13 +19,13 @@ class Field:
 		error = self.error(err_arr)
 		emp = self.empty(err_arr)
 		if error == False and emp == False:
-			usr = user.User()
+			user = User()
 			data_checked = [data_to_check.first_name,
 							data_to_check.last_name,
 							data_to_check.email,
 							data_to_check.phone,
 							data_to_check.password]
-			usr.create(data_checked)
+			user.create(data_checked)
 			return True
 		else:
 			return error
@@ -115,17 +117,10 @@ class Field:
 		else:
 			return False
 
-	def refresh_db(self):
-		key = Keys()
-		self.db = mysql.connector.connect(host = key.mysql_host,
-                                        user = key.mysql_user,
-                                        passwd = key.mysql_password,
-                                        database = key.mysql_database)
-		self.cursor = self.db.cursor()
 
 if __name__ == '__main__':
 	field = Field()
-	user_profile = ['user','test','usertest13@gmail.com','37011002','123456789','123456789']
+	user_profile = ['user','test','usertest1134@gmail.com','37011002','123456789','123456789']
 	print(field.check(user_profile))
 	print(field.station_name('Vinny'))
 

@@ -1,10 +1,11 @@
 from private import Keys
 from collections import namedtuple
-import mysql.connector
 
-class Station:
+
+class Station(Keys):
 
 	def __init__(self,email):
+		super().__init__()
 		self.email = email
 		self.station = namedtuple('station','franchisor name streetAddress city department numOfTanks')
 
@@ -57,14 +58,6 @@ class Station:
 		self.numOfTanks = station_data.numOfTanks
 		self.db.close()
 
-
-	def refresh_db(self):
-		key = Keys()
-		self.db = mysql.connector.connect(host = key.mysql_host,
-                                        user = key.mysql_user,
-                                        passwd = key.mysql_password,
-                                        database = key.mysql_database)
-		self.cursor = self.db.cursor()
 
 
 

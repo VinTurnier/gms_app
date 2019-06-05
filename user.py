@@ -1,11 +1,11 @@
 from herokuappRequest import app
 from collections import namedtuple
-import mysql.connector
 from private import Keys
 
-class User:
+class User(Keys):
 
 	def __init__(self):
+		super().__init__()
 		self.is_loggedin = False
 
 	def login(self,email,password):
@@ -70,16 +70,6 @@ class User:
 		cursor = self.db.cursor()
 		cursor.execute(command,values)
 		self.db.commit()
-
-
-
-	def refresh_db(self):
-		key = Keys()
-		self.db = mysql.connector.connect(host = key.mysql_host,
-                                        user = key.mysql_user,
-                                        passwd = key.mysql_password,
-                                        database = key.mysql_database)
-		self.cursor = self.db.cursor()
 
 
 if __name__ == '__main__':
