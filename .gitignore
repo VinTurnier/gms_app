@@ -2,3 +2,6 @@ gmsMainWindow.py
 gmsMainWindow.ui
 private.py
 __pycache__
+build
+dist
+setup.py
