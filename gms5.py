@@ -1,6 +1,5 @@
 
 import gmsMainWindow
-import mysql.connector
 from datetime import date
 from collections import namedtuple
 from PyQt5 import QtCore, QtGui, QtWidgets
