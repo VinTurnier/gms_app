@@ -77,14 +77,13 @@ class Field:
 			return name[0].capitalize()
 		else:
 			# er0111: name cannot have non alphabetic characters
-			return 'er0111'
+			return 'er1111'
 
 	def station_name(self,name):
-
+		self.refresh_db()
 		command ="SELECT name FROM station WHERE name =\'"+name+"\'"
-		cursor = self.db.cursor()
-		cursor.execute(command)
-		names = cursor.fetchall()
+		self.cursor.execute(command)
+		names = self.cursor.fetchall()
 		if not names:
 			return name
 		else:
@@ -101,8 +100,9 @@ class Field:
         #                       er0101: Password does not match
         #                       er0110: Username or password do not match
         #						er0111: name contains non-alphabetical characters
+        #						er1111: First name or last name cannot contain non-alphabetical characters
 
-		errors = ['er0001','er0010','er0011','er0100','er0101','er0110','er0111']
+		errors = ['er0001','er0010','er0011','er0100','er0101','er0110','er1111','er0111']
 		for i in error:
 			if i in errors:
 				return i
@@ -127,6 +127,6 @@ if __name__ == '__main__':
 	field = Field()
 	user_profile = ['user','test','usertest13@gmail.com','37011002','123456789','123456789']
 	print(field.check(user_profile))
-	print(field.name('vincent'))
+	print(field.station_name('Vinny'))
 
 
