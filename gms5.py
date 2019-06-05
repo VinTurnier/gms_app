@@ -11,53 +11,10 @@ import user
 import fields
 import station
 import gmsQueries
-from private import Keys
 import tank
+from private import Keys
 
-# class Tank:
-#     tank = namedtuple('tank','name capacity diameter length thickness')
 
-#     def __init__(self,station_id):
-#         key = Keys()
-#         self.station_id = station_id
-#         self.tankName = None
-#         self.tank_id = None
-#         self.capacity = None
-#         self.diameter = None
-#         self.length = None
-#         self.thickness = None
-#         self.db = mysql.connector.connect(host = key.mysql_host,
-#                                         user = key.mysql_user,
-#                                         passwd = key.mysql_password,
-#                                         database = key.mysql_database)
-
-#     def create(self,tankInfo = None):
-#         command = "INSERT INTO tank(station_id,name,capacity,diameter,length,thickness) VALUES(%s,%s,%s,%s,%s,%s)"
-#         cursor = self.db.cursor()
-#         for tank in tankInfo:
-#             tank_data = self.tank._make(tuple(tank))
-#             value = (self.station_id,
-#                      tank_data.name,
-#                      tank_data.capacity,
-#                      tank_data.diameter,
-#                      tank_data.length,
-#                      tank_data.thickness)
-#             cursor.execute(command,value)
-#             self.db.commit()
-
-#     def info(self,tankName):
-#         if tankName == "N/A":
-#             return 'er0000'
-#         else:
-#             command = "SELECT * FROM tank WHERE station_id = \'"+str(self.station_id)+"\' AND name = \'"+tankName+"\'"
-#             cursor = self.db.cursor()
-#             cursor.execute(command)
-#             tank_info = cursor.fetchall()
-#             self.tank_id = tank_info[0][0]
-#             self.capacity = tank_info[0][3]
-#             self.diameter = tank_info[0][4]
-#             self.length = tank_info[0][5]
-#             self.thickness = tank_info[0][6]
 
 class gmsMain:
     error = {'er0000':"Please make sure that all text field are filled with the appropriate information",
