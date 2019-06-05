@@ -1,10 +1,11 @@
 from private import Keys
-import mysql.connector
 from collections import namedtuple
 
 
-class Query:
+class Query(Keys):
 
+	def __init__(self):
+		super().__init__()
 
 	def displayCRX(self,id_citern):
 		self.refresh_db()
@@ -131,12 +132,4 @@ class Query:
 		self.db.close()
 		return data
 
-
-	def refresh_db(self):
-		key = Keys()
-		self.db = mysql.connector.connect(host = key.mysql_host,
-                                        user = key.mysql_user,
-                                        passwd = key.mysql_password,
-                                        database = key.mysql_database)
-		self.cursor = self.db.cursor()
 
