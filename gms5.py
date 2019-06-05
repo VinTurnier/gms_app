@@ -1,11 +1,10 @@
-
-import gmsMainWindow
 from datetime import date
 from collections import namedtuple
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 # GMS Modules
+import gmsMainWindow
 import user
 import fields
 import station
