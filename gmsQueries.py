@@ -1,6 +1,5 @@
 
 
-
 class Query:
 
 	def __init__(self):
@@ -34,7 +33,7 @@ class Query:
 		na_count = 0
 		for measurement in measurements:
 			if "N/A" in measurement:
-			na_count +=1
+				na_count +=1
 
 		for measurement in measurements:
 			if na_count!=5:
@@ -125,4 +124,13 @@ class Query:
 		cursor = self.db.cursor()
 		cursor.execute(command)
 		return cursor.fetchall()
+
+
+	def refresh_db(self):
+		key = Keys()
+		self.db = mysql.connector.connect(host = key.mysql_host,
+                                        user = key.mysql_user,
+                                        passwd = key.mysql_password,
+                                        database = key.mysql_database)
+		self.cursor = self.db.cursor()
 
