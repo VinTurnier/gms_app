@@ -24,12 +24,13 @@ class Tank(Keys):
 			self.db.commit()
 		self.db.close()
 	def info(self,tankName):
+		self.refresh_db()
 		if tankName == "N/A":
 			return 'er0000'
 		else:
 			command = "SELECT * FROM tank WHERE station_id = \'"+str(self.station_id)+"\' AND name = \'"+tankName+"\'"
 			self.cursor.execute(command)
-			tank_info = cursor.fetchall()
+			tank_info = self.cursor.fetchall()
 			self.tank_id = tank_info[0][0]
 			self.capacity = tank_info[0][3]
 			self.diameter = tank_info[0][4]
