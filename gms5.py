@@ -154,8 +154,13 @@ class gmsMain:
             tankName = self.mainWindow.tankSelect_comboBox.currentText()
             fuel_receive_today = self.a_query.received_quantity_for(tankName,self.mainWindow.tank_dateEdit.text())
             stockEoPD = self.a_query.end_of_previous_day_volume_for(tankName,self.mainWindow.tank_dateEdit.text())
+            sales_and_stockEoD = self.a_query.sales_and_stockEoD_for(tankName,self.mainWindow.tank_dateEdit.text())
+            lost_fuel = self.a_query.calculated_lost_for(tankName,self.mainWindow.tank_dateEdit.text())
             self.mainWindow.fuelReceived_doubleSpinBox.setValue(fuel_receive_today)
             self.mainWindow.StockBoD_doubleSpinBox.setValue(stockEoPD)
+            self.mainWindow.sales_doubleSpinBox.setValue(sales_and_stockEoD['sales'])
+            self.mainWindow.StockEoD_doubleSpinBox.setValue(sales_and_stockEoD['stockEoD'])
+            self.mainWindow.lost_fuel_doubleSpinBox.setValue(lost_fuel)
         except:
             pass
 
@@ -418,7 +423,6 @@ class gmsMain:
 
     def addInventory(self):
         self.tank = tank.Tank(self.station.stationId)
-        
         tankName = self.mainWindow.tankSelect_comboBox.currentText()
         if self.tank.info(tankName) == 'er0000':
             self.mainWindow.msgBoxError(self.error['er0000'])
@@ -431,8 +435,13 @@ class gmsMain:
             sales = self.mainWindow.sales_doubleSpinBox.value()
             stockEoD = self.mainWindow.StockEoD_doubleSpinBox.value()
             date = self.mainWindow.tank_dateEdit.text()
-            inventoryData = [self.station.stationId,self.tank.tank_id, stockBoD, fuelDeposit, sales, stockEoD, date]
-            self.query.inventory(inventoryData)
+            tank_data = [self.station.stationId,self.tank.tank_id] 
+            inventory_data = [stockBoD, fuelDeposit, sales, stockEoD, date]
+            update_data = [stockBoD,sales,stockEoD,date]
+            if self.a_query.update_inventory(tankName,date,update_data) == 'No Updates':
+                self.query.inventory(tank_data+inventory_data)
+            else:
+                self.mainWindow.msgBox('Inventory has been Updated')
             self.clearInventory()
             
     def clearInventory(self):
@@ -451,7 +460,7 @@ if __name__ == "__main__":
     sys.exit(app.exec_())
 
 
-# class Ui_MainWindow(QtWidgets.QMessageBox):
+# class Ui_GMSAnalytics(QtWidgets.QMessageBox):
 #
 #     def msgBoxError(self,message = ''):
 #         QtWidgets.QMessageBox.about(self, "Error", message)
