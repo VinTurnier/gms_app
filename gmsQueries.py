@@ -99,7 +99,8 @@ class Query(Keys):
 						JOIN fuelDeposit \
 						ON (measurements.fuelDeposit_id = fuelDeposit.id) \
 						WHERE fuelDeposit.station_id = \''+str(station_id)+'\' \
-						AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()',
+						AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()\
+						ORDER BY fuelDeposit.date_added DESC',
 				'Inventory': 'SELECT tank.name, \
 							inventory.stockBoD, \
 							inventory.fuelDeposit, \
@@ -109,7 +110,8 @@ class Query(Keys):
 							FROM tank JOIN inventory \
 							ON (tank.id = inventory.tank_id) \
 							WHERE tank.station_id = \''+str(station_id)+'\' \
-							AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()',
+							AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()\
+							ORDER BY inventory.date_added DESC',
 				'Fuel Deposit': 'SELECT fuelDeposit.idCitern, \
 						truckCapacity.crx1+truckCapacity.crx2\
 						+truckCapacity.crx3+truckCapacity.crx4+truckCapacity.crx5 \
@@ -118,7 +120,8 @@ class Query(Keys):
 						FROM fuelDeposit JOIN truckCapacity \
 						ON (truckCapacity.id_citern = fuelDeposit.idCitern)\
 						WHERE station_id = \''+str(station_id)+'\' \
-						AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()'}
+						AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()\
+						ORDER BY fuelDeposit.date_added DESC'}
 
 
 		self.tableHeader = {"CRX": ("ID Citern","CRX1","CRX2","CRX3","CRX4","CRX5","Eperation Date"),
