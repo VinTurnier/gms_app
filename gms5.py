@@ -162,7 +162,7 @@ class gmsMain:
             self.mainWindow.StockEoD_doubleSpinBox.setValue(sales_and_stockEoD['stockEoD'])
             self.mainWindow.lost_fuel_doubleSpinBox.setValue(lost_fuel)
         except:
-            pass
+            self.mainWindow.lost_fuel_doubleSpinBox.setValue(0)
 
     def fuelDataInput_page(self):
         self.mainWindow.gmsAnalytics_stackedWidget.setCurrentIndex(0)
@@ -424,26 +424,27 @@ class gmsMain:
     def addInventory(self):
         self.tank = tank.Tank(self.station.stationId)
         tankName = self.mainWindow.tankSelect_comboBox.currentText()
+        self.tank.info(tankName)
+        stockBoD = self.mainWindow.StockBoD_doubleSpinBox.value()
+        fuelDeposit = self.mainWindow.fuelReceived_doubleSpinBox.value()
+        sales = self.mainWindow.sales_doubleSpinBox.value()
+        stockEoD = self.mainWindow.StockEoD_doubleSpinBox.value()
+        date = self.mainWindow.tank_dateEdit.text()
+        tank_data = [self.station.stationId,self.tank.tank_id] 
+        inventory_data = [stockBoD, fuelDeposit, sales, stockEoD, date]
+        update_data = [stockBoD,sales,stockEoD,date]
+
         if self.tank.info(tankName) == 'er0000':
             self.mainWindow.msgBoxError(self.error['er0000'])
             self.clearInventory()
-        else:
-            
-            self.tank.info(tankName)
-            stockBoD = self.mainWindow.StockBoD_doubleSpinBox.value()
-            fuelDeposit = self.mainWindow.fuelReceived_doubleSpinBox.value()
-            sales = self.mainWindow.sales_doubleSpinBox.value()
-            stockEoD = self.mainWindow.StockEoD_doubleSpinBox.value()
-            date = self.mainWindow.tank_dateEdit.text()
-            tank_data = [self.station.stationId,self.tank.tank_id] 
-            inventory_data = [stockBoD, fuelDeposit, sales, stockEoD, date]
-            update_data = [stockBoD,sales,stockEoD,date]
-            if self.a_query.update_inventory(tankName,date,update_data) == 'No Updates':
-                self.query.inventory(tank_data+inventory_data)
-            else:
-                self.mainWindow.msgBox('Inventory has been Updated')
+        elif self.a_query.update_inventory(tankName,date,update_data) == 'No Updates':
+            self.query.inventory(tank_data+inventory_data) 
+            self.mainWindow.msgBox('Inventory has been Added to database')
             self.clearInventory()
-            
+        elif self.a_query.update_inventory(tankName,date,update_data) == 'Updated':
+            self.mainWindow.msgBox('Inventory has been Updated')
+            self.clearInventory()
+
     def clearInventory(self):
         self.mainWindow.StockBoD_doubleSpinBox.clear()
         self.mainWindow.fuelReceived_doubleSpinBox.clear()
