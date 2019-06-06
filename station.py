@@ -25,6 +25,7 @@ class Station(Keys):
 	def create(self, stationInfo = None):
 		#1) takes in the station information
 		#2) takes the tank information
+		self.refresh_db()
 		station_data = self.station._make(tuple(stationInfo))
 		command = "INSERT INTO station (franchisor,name,streetAddress,city,department,numOfTanks) VALUES(%s,%s,%s,%s,%s,%s)"
 		values = (station_data.franchisor,
@@ -33,9 +34,10 @@ class Station(Keys):
 					station_data.city,
 					station_data.department,
 					station_data.numOfTanks)
-		cursor = self.db.cursor()
-		cursor.execute(command,values)
+		
+		self.cursor.execute(command,values)
 		self.db.commit()
+		self.db.close()
 		self.info(station_data.name)
 		
 
