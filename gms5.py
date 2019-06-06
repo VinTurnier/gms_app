@@ -10,6 +10,7 @@ import fields
 import station
 import gmsQueries
 import tank
+import advanceQueries
 
 
 
@@ -35,6 +36,7 @@ class gmsMain:
         self.usr = user.User()
         self.field = fields.Field()
         self.query = gmsQueries.Query()
+        
 
 
         #User Actions Code
@@ -69,7 +71,8 @@ class gmsMain:
         self.mainWindow.dataSearch_btn.clicked.connect(self.displayTable)
         self.mainWindow.tankSubmit_btn.clicked.connect(self.addInventory)
         self.mainWindow.selectStation_comboBox.currentIndexChanged.connect(self.changeStation)
-
+        self.mainWindow.tankSelect_comboBox.currentIndexChanged.connect(self.changeTank)
+        self.mainWindow.tank_dateEdit.dateChanged.connect(self.changeTank)
 
     def loginAction(self):
         
@@ -141,6 +144,18 @@ class gmsMain:
             self.station.info(stationName)
             self.station_id = self.station.stationId
             self.fuelType()
+            self.a_query = advanceQueries.aQuery(self.station_id)
+        except:
+            pass
+
+    def changeTank(self):
+        try:
+            self.tank = tank.Tank(self.station.stationId)
+            tankName = self.mainWindow.tankSelect_comboBox.currentText()
+            fuel_receive_today = self.a_query.received_quantity_for(tankName,self.mainWindow.tank_dateEdit.text())
+            stockEoPD = self.a_query.end_of_previous_day_volume_for(tankName,self.mainWindow.tank_dateEdit.text())
+            self.mainWindow.fuelReceived_doubleSpinBox.setValue(fuel_receive_today)
+            self.mainWindow.StockBoD_doubleSpinBox.setValue(stockEoPD)
         except:
             pass
 
@@ -256,8 +271,8 @@ class gmsMain:
         user_id = self.usr.id
         self.station.create(self.setupStation_info)
         station_id = self.station.stationId
-        tank = Tank(station_id)
-        tank.create(self.tankData)
+        tanks = tank.Tank(station_id)
+        tanks.create(self.tankData)
         self.usr.add_station(station_id)
         self.mainWindow.msgBox("Station has been created")
         self.logoutAction()
@@ -403,11 +418,13 @@ class gmsMain:
 
     def addInventory(self):
         self.tank = tank.Tank(self.station.stationId)
+        
         tankName = self.mainWindow.tankSelect_comboBox.currentText()
         if self.tank.info(tankName) == 'er0000':
             self.mainWindow.msgBoxError(self.error['er0000'])
             self.clearInventory()
         else:
+            
             self.tank.info(tankName)
             stockBoD = self.mainWindow.StockBoD_doubleSpinBox.value()
             fuelDeposit = self.mainWindow.fuelReceived_doubleSpinBox.value()
