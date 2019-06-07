@@ -76,8 +76,6 @@ class gmsMain:
 
     def loginAction(self):
         
-        
-
         email = self.mainWindow.loginId_lineEdit.text()
         password = self.mainWindow.password_lineEdit.text()
 
