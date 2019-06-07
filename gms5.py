@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from collections import namedtuple
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -35,7 +35,6 @@ class gmsMain:
         #Modules initialized
         self.usr = user.User()
         self.field = fields.Field()
-        self.query = gmsQueries.Query()
         
 
 
@@ -64,11 +63,10 @@ class gmsMain:
         self.mainWindow.tanks_btn.clicked.connect(self.tankDataInput_page)
         self.mainWindow.data_btn.clicked.connect(self.dataDatainput_page)
         self.mainWindow.fuelSearch_btn.clicked.connect(self.displayCRX)
-        self.period_comboBox_text()
         self.table_comboBox_text()
         self.currentDate()
         self.mainWindow.fuelSubmit_btn.clicked.connect(self.addMeasurements)
-        self.mainWindow.dataSearch_btn.clicked.connect(self.displayTable)
+        self.mainWindow.dataSearch_btn.clicked.connect(self.display_table)
         self.mainWindow.tankSubmit_btn.clicked.connect(self.addInventory)
         self.mainWindow.selectStation_comboBox.currentIndexChanged.connect(self.changeStation)
         self.mainWindow.tankSelect_comboBox.currentIndexChanged.connect(self.changeTank)
@@ -143,6 +141,7 @@ class gmsMain:
             self.station_id = self.station.stationId
             self.fuelType()
             self.a_query = advanceQueries.aQuery(self.station_id)
+            self.query = gmsQueries.Query(self.station_id)
         except:
             pass
 
@@ -212,9 +211,6 @@ class gmsMain:
         franchisors = ('Total','National','Go','Capital','DNC')
         self.mainWindow.franchisor_comboBox.addItems(franchisors)
 
-    def period_comboBox_text(self):
-        dates = ('1 Day','5 Days','1 Month','3 Months','6 Months','1 Year', '5 Years','All')
-        self.mainWindow.dataPeriod_comboBox.addItems(dates)
 
     def table_comboBox_text(self):
         tables = ('CRX', 'Measurements','Inventory','Fuel Deposit')
@@ -342,11 +338,10 @@ class gmsMain:
         self.station.db.close()
 
     def currentDate(self):
-        today = date.today()
-        now = today.strftime("%Y-%m-%d")
-        today = self.mainWindow.tank_dateEdit.dateTimeFromText(now)
-        self.mainWindow.tank_dateEdit.setDate(today.date())
-        self.mainWindow.fuel_dateEdit.setDate(today.date())
+        self.mainWindow.tank_dateEdit.setDate(date.today())
+        self.mainWindow.fuel_dateEdit.setDate(date.today())
+        self.mainWindow.start_dateEdit.setDate(date.today()-timedelta(days=30))
+        self.mainWindow.end_dateEdit.setDate(date.today())
 
     def addMeasurements(self):
 
@@ -392,22 +387,34 @@ class gmsMain:
             self.mainWindow.msgBoxError(self.error['er0000'])
             return -1
 
-            
+    def setup_table(self):
+        table_name = self.mainWindow.tableSelection_comboBox.currentText()
+        start_date = self.mainWindow.start_dateEdit.text()
+        end_date = self.mainWindow.end_dateEdit.text()
+        if table_name == 'Inventory':
+            return self.query.inventory_between(start_date,end_date)
+        elif table_name == 'Fuel Deposit':
+            return self.query.fuel_deposit_between(start_date,end_date)
+        elif table_name == 'Measurements':
+            return self.query.measurements_between(start_date,end_date)
+        elif table_name == 'CRX':
+            return self.query.crx()
+
             
 
-    def displayTable(self):
-        tableName = self.mainWindow.tableSelection_comboBox.currentText()
-        period = self.mainWindow.dataPeriod_comboBox.currentText()
-        self.station.info(self.mainWindow.selectStation_comboBox.currentText())
-        data = self.query.displayData(self.station.stationId,tableName,period)
-        tableHeader = self.query.tableHeader[tableName]
-        self.mainWindow.data_tableWidget.setColumnCount(len(tableHeader))
-        self.mainWindow.data_tableWidget.setHorizontalHeaderLabels(tableHeader)
-        self.mainWindow.data_tableWidget.setRowCount(len(data))
+    def display_table(self):
+        #tableName = self.mainWindow.tableSelection_comboBox.currentText()
+        #period = self.mainWindow.dataPeriod_comboBox.currentText()
+        #self.station.info(self.mainWindow.selectStation_comboBox.currentText())
+        data_set = self.setup_table()
+        table_header = self.query.table_header
+        self.mainWindow.data_tableWidget.setColumnCount(len(table_header))
+        self.mainWindow.data_tableWidget.setHorizontalHeaderLabels(table_header)
+        self.mainWindow.data_tableWidget.setRowCount(len(data_set))
         self.mainWindow.data_tableWidget.hide()
         self.mainWindow.data_tableWidget.show()
         rowID = 0
-        for row in data:
+        for row in data_set:
             columnID = 0
             for column in row:
                 item = QtWidgets.QTableWidgetItem()
