@@ -121,7 +121,8 @@ class Query(Keys):
 						ON (truckCapacity.id_citern = fuelDeposit.idCitern)\
 						WHERE station_id = \''+str(station_id)+'\' \
 						AND date_added BETWEEN(CURDATE() - INTERVAL '+period[periods]+') AND CURDATE()\
-						ORDER BY fuelDeposit.date_added DESC'}
+						ORDER BY fuelDeposit.date_added DESC',
+				'Lost Per Day':''}
 
 
 		self.tableHeader = {"CRX": ("ID Citern","CRX1","CRX2","CRX3","CRX4","CRX5","Eperation Date"),
