@@ -106,6 +106,7 @@ class gmsMain:
         
         if self.field.check(signup_data) == True:
             self.mainWindow.msgBox("""Your profile has been created. Next create your station, if your station already exist, add the station code.""")
+            self.usr.login(self.mainWindow.email_lineEdit.text(),self.mainWindow.newPassword_lineEdit.text())
             self.mainWindow.main_stackedWidget.setCurrentIndex(2)
             self.mainWindow.fName_lineEdit.clear()
             self.mainWindow.lName_lineEdit.clear()
@@ -168,6 +169,8 @@ class gmsMain:
         self.mainWindow.gmsAnalytics_stackedWidget.setCurrentIndex(1)
 
     def dataDatainput_page(self):
+        self.mainWindow.analysis_stackedWidget.setCurrentIndex(1)
+        self.mainWindow.total_and_average_stackedWidget.setCurrentIndex(1)
         self.mainWindow.gmsAnalytics_stackedWidget.setCurrentIndex(2)
 
     def logoutAction(self):
@@ -213,7 +216,8 @@ class gmsMain:
 
 
     def table_comboBox_text(self):
-        tables = ('CRX', 'Measurements','Inventory','Fuel Deposit')
+        tables = ('CRX', 'Measurements','Inventory','Fuel Deposit','Losses')
+        self.mainWindow.inventory_analysis_comboBox.addItems(('Tanks',))
         self.mainWindow.tableSelection_comboBox.addItems(tables)
 
     def createNewStation_page(self):
@@ -274,13 +278,17 @@ class gmsMain:
         tanks.create(self.tankData)
         self.usr.add_station(station_id)
         self.mainWindow.msgBox("Station has been created")
-        self.logoutAction()
+        self.mainWindow.main_stackedWidget.setCurrentIndex(0)
+        self.selectStation_comboBox_text(tuple(self.usr.stations))
+        self.mainWindow.loginId_lineEdit.clear()
+        _translate = QtCore.QCoreApplication.translate
+        self.mainWindow.username_label.setText(_translate("MainWindow", self.usr.first_name)+' '+self.usr.last_name)
+        self.fuelType()
         self.mainWindow.tableWidget.clear()
         self.mainWindow.stationName_lineEdit.clear()
         self.mainWindow.streetAddress_lineEdit.clear()
         self.mainWindow.city_lineEdit.clear()
         self.mainWindow.department_lineEdit.clear()
-        self.mainWindow.gmsStationSetup_stackedWidget.setCurrentIndex(1)
 
     def show(self):
         self.gmsMainWindow.show()
@@ -392,24 +400,36 @@ class gmsMain:
         start_date = self.mainWindow.start_dateEdit.text()
         end_date = self.mainWindow.end_dateEdit.text()
         if table_name == 'Inventory':
+            self.mainWindow.analysis_stackedWidget.setCurrentIndex(1)
+            self.mainWindow.total_and_average_stackedWidget.setCurrentIndex(1)
             return self.query.inventory_between(start_date,end_date)
         elif table_name == 'Fuel Deposit':
+            self.mainWindow.analysis_stackedWidget.setCurrentIndex(1)
+            self.mainWindow.total_and_average_stackedWidget.setCurrentIndex(1)
             return self.query.fuel_deposit_between(start_date,end_date)
         elif table_name == 'Measurements':
+            self.mainWindow.analysis_stackedWidget.setCurrentIndex(1)
+            self.mainWindow.total_and_average_stackedWidget.setCurrentIndex(1)
             return self.query.measurements_between(start_date,end_date)
         elif table_name == 'CRX':
+            self.mainWindow.analysis_stackedWidget.setCurrentIndex(1)
+            self.mainWindow.total_and_average_stackedWidget.setCurrentIndex(1)
             return self.query.crx()
+        elif table_name == 'Losses':
+            self.mainWindow.analysis_stackedWidget.setCurrentIndex(0)
+            self.mainWindow.total_and_average_stackedWidget.setCurrentIndex(0)
+            data_set = self.query.station_loss_between(start_date,end_date)
+            loss = self.a_query.average_and_total_loss_between(start_date,end_date)
+            self.mainWindow.average_loss_doubleSpinBox.setValue(loss['average'])
+            self.mainWindow.total_loss_doubleSpinBox.setValue(loss['total'])
+            return data_set
 
             
 
     def display_table(self):
-        #tableName = self.mainWindow.tableSelection_comboBox.currentText()
-        #period = self.mainWindow.dataPeriod_comboBox.currentText()
-        #self.station.info(self.mainWindow.selectStation_comboBox.currentText())
         data_set = self.setup_table()
-        table_header = self.query.table_header
-        self.mainWindow.data_tableWidget.setColumnCount(len(table_header))
-        self.mainWindow.data_tableWidget.setHorizontalHeaderLabels(table_header)
+        self.mainWindow.data_tableWidget.setColumnCount(len(self.query.table_header))
+        self.mainWindow.data_tableWidget.setHorizontalHeaderLabels(self.query.table_header)
         self.mainWindow.data_tableWidget.setRowCount(len(data_set))
         self.mainWindow.data_tableWidget.hide()
         self.mainWindow.data_tableWidget.show()

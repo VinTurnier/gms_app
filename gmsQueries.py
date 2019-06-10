@@ -6,6 +6,7 @@ class Query(Keys):
 
 	def __init__(self,station_id):
 		self.station_id = station_id
+		self.table_header = ('trial',)
 		super().__init__()
 
 	def displayCRX(self,id_citern):
@@ -141,6 +142,23 @@ class Query(Keys):
 						AND date_added BETWEEN CAST(\''+start_date+'\' AS DATE) AND CAST(\''+end_date+'\' AS DATE)\
 						ORDER BY fuelDeposit.date_added DESC'
 
+		self.cursor.execute(query)
+		data_set = self.cursor.fetchall()
+		self.db.close()
+		return data_set
+
+	def station_loss_between(self,start_date,end_date):
+		self.refresh_db()
+		self.table_header = ("Tank Name","Loss Quantity","Date")
+		query = 'SELECT tank.name,\
+						inventory.stockEoD-((inventory.stockBoD+inventory.fuelDeposit)-inventory.sales) lost,\
+						inventory.date_added\
+				 FROM inventory \
+				 JOIN tank \
+				 ON (inventory.tank_id = tank.id) \
+				 WHERE inventory.station_id = \''+str(self.station_id)+'\'\
+				 AND date_added BETWEEN CAST(\''+start_date+'\' AS DATE) AND CAST(\''+end_date+'\' AS DATE)\
+				 ORDER BY inventory.date_added DESC'
 		self.cursor.execute(query)
 		data_set = self.cursor.fetchall()
 		self.db.close()
