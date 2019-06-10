@@ -271,19 +271,22 @@ class gmsMain:
 
     def createStation(self):
         self.usr.info()
+        self.station = station.Station(self.usr.email)
         user_id = self.usr.id
         self.station.create(self.setupStation_info)
         station_id = self.station.stationId
         tanks = tank.Tank(station_id)
         tanks.create(self.tankData)
         self.usr.add_station(station_id)
+        self.usr.info()
         self.mainWindow.msgBox("Station has been created")
         self.mainWindow.main_stackedWidget.setCurrentIndex(0)
-        self.selectStation_comboBox_text(tuple(self.usr.stations))
         self.mainWindow.loginId_lineEdit.clear()
         _translate = QtCore.QCoreApplication.translate
         self.mainWindow.username_label.setText(_translate("MainWindow", self.usr.first_name)+' '+self.usr.last_name)
+        self.station_id = self.station.stationId
         self.fuelType()
+        self.selectStation_comboBox_text(tuple(self.usr.stations))
         self.mainWindow.tableWidget.clear()
         self.mainWindow.stationName_lineEdit.clear()
         self.mainWindow.streetAddress_lineEdit.clear()
