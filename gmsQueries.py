@@ -129,8 +129,9 @@ class Query(Keys):
 
 	def measurements_between(self,start_date,end_date):
 		self.refresh_db()
-		self.table_header = ("Compartement","Tank","Recieved Height","Deposit Height","Date")
-		query = 'SELECT measurements.compt, \
+		self.table_header = ("Truck ID","Compartement","Fuel Type","Recieved Height","Deposit Height","Date")
+		query = 'SELECT fuelDeposit.idCitern, \
+						measurements.compt, \
 						measurements.fuelType, \
 						measurements.rHeight, \
 						measurements.dheight, \
